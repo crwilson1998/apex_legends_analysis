@@ -5,7 +5,6 @@
 
 library(ggplot2)
 library(dplyr)
-library(tidyr)
 
 # Import the data
 season_fifteen <- read.csv("Apex_Game_History_Season15S1.csv")
@@ -15,11 +14,10 @@ colnames(season_fifteen)
 glimpse(season_fifteen)
 summary(season_fifteen)
 str(season_fifteen)
-nrow(season_fifteen)
 
-# Start cleaning by remove null values and dirty data
+# Start cleaning by removing null values and dirty data
 season_fifteen <- na.omit(season_fifteen) %>%
-                  select(-ï..date, -teamate_count, -teamate_quit_count)
+                  select(-Ã¯..date, -teamate_count, -teamate_quit_count)
 season_fifteen <- season_fifteen[season_fifteen$my_legend != 'Cantage',]
 season_fifteen['game'] <- as.logical(season_fifteen$game)
 
@@ -28,7 +26,6 @@ colnames(season_fifteen)
 glimpse(season_fifteen)
 summary(season_fifteen)
 str(season_fifteen)
-nrow(season_fifteen)
 
 # Which team comps had the highest rp earned on broken moon?
 team_comps <- season_fifteen %>% 
@@ -120,22 +117,17 @@ ggplot(rp_gain_in_total,aes(x = my_legend, y = total_sr_gained, fill = my_legend
   theme(axis.text.x = element_text(angle = 90))
 
 # Now lets see what it was per rank
-sr_gain_per_rank <- sr_gain_spread %>% 
+sr_gain_per_rank <- rp_gain_spread %>% 
                     group_by(my_legend,my_rank) %>% 
                     summarise(total_sr_gained = sum(rp_earned)) %>%
                     arrange(desc(total_sr_gained),my_rank)  
 sr_gain_per_rank
 
-# Let's visualize the result set
-ggplot(sr_gain_per_rank,aes(x = my_rank, y = total_sr_gained, fill = my_legend)) + 
-  geom_bar(stat="identity",position = "dodge") +
-  labs(title = "RP Gained for each Rank and Legend", x = "Legend", y = "RP Gained") 
-
 # If you want to see a specific legends journey for the season uncomment the next line 
 # and set my_legend equal to the legend you want
 
-# chosen_legend <- subset(sr_gain_per_rank,my_legend == 'Vantage')
-ggplot(chosen_legend, aes(x = my_rank, y = total_sr_gained, group = my_legend, color = my_legend)) +
+chosen_legend <- subset(sr_gain_per_rank,my_legend == 'Vantage')
+ggplot(chosen_legend, aes(x = my_rank, y = total_sr_gained, group = my_legend)) +
   geom_line() +
   geom_point() +
   labs(title = "RP Gained by Rank for a Legend", x = "Rank", y = "RP Gained") +
